@@ -1,16 +1,12 @@
 package com.zktechproductionhk.zetabase;
 
 import android.content.Context;
-import android.util.Log;
 
-import com.zktechproductionhk.zetabase.Storage.DataSnapshot;
-import com.zktechproductionhk.zetabase.Storage.StorageProxy;
-
-public class Zetabase {
+public class Zetabase<T extends Object> {
     private static final String TAG = "[Zetabase]";
     private static Zetabase instance;
     private Context context;
-    private com.zktechproductionhk.zetabase.Storage.InternalStorage.FileWriter FileWriter;
+    private StorageAdapter<T> storageAdapter;
 
     public static Zetabase getInstance(Context context) {
         if (instance == null) instance = new Zetabase(context);
@@ -19,13 +15,30 @@ public class Zetabase {
 
     private Zetabase(Context context) {
         this.context = context;
-        FileWriter = FileWriter.getInstance(context);
+        this.storageAdapter = StorageAdapter.getInstance(context);
+    }
 
-        StorageProxy<String> sp = new StorageProxy<>();
-        sp.write("/", "ABCDE");
+    public void write(String path, T data) {
+        storageAdapter.write(path, data);
+    }
 
-        DataSnapshot<String> dataSnapshot = sp.read("/");
+    public void append(String path, T data) {
+        storageAdapter.append(path, data);
+    }
 
-        Log.d(TAG, dataSnapshot.value());
+    public DataSnapshot<T> read(String path) {
+        return storageAdapter.read(path);
+    }
+
+    public String showInfo() {
+        return storageAdapter.showInfo();
+    }
+
+    public String toJSON() {
+        return storageAdapter.toJSON();
+    }
+
+    public void parseJSON(String json) {
+        storageAdapter.fromJSON(context, json);
     }
 }
